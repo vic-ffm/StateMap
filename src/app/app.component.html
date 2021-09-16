@@ -3,8 +3,9 @@
   <h1>
     Welcome to {{ title }}!
   </h1>
-  <!-- <app-map></app-map> -->
-  <div class="content" role="main">
-    <div #mapView></div>
-  </div>
+  <app-esri-map
+  [center]="mapCenter"
+  [basemap]="basemapType"
+  [zoom]="mapZoomLevel"
+></app-esri-map>
 </div>

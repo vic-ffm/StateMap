@@ -1,0 +1,15 @@
+
+.esri-view {
+  height: 100%;
+  width: 100%;
+  outline: none;
+}
+
+.content {
+  display: flex;
+  margin: 32px auto;
+  flex-direction: column;
+  align-items: center;
+  height: 590px;
+  background-color: #f0f0f0;
+}

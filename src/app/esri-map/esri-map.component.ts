@@ -1,6 +1,7 @@
 import { Component, OnInit,  ViewChild,  ElementRef,  Input,  Output,  EventEmitter,  OnDestroy } from '@angular/core';
 import { loadModules } from "esri-loader";
 import esri = __esri; // Esri TypeScript Types
+import { BurnsService } from '../services/burns.service';
 
 @Component({
   selector: 'app-esri-map',
@@ -17,14 +18,16 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
 
   private view: esri.MapView = null;
-  constructor() { }
+  constructor(private burnsService: BurnsService) { }
 
   async initializeMap() {
     try {
       // Load the modules for the ArcGIS API for JavaScript
-      const [EsriMap, EsriMapView] = await loadModules([
+      const [EsriMap, EsriMapView, Graphic, GraphicsLayer] = await loadModules([
         "esri/Map",
-        "esri/views/MapView"
+        "esri/views/MapView",
+        "esri/Graphic",
+        "esri/layers/GraphicsLayer"
       ]);
 
       // Configure the Map
@@ -41,6 +44,55 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         zoom: this.zoom,
         map: map
       };
+
+      const graphicsLayer = new GraphicsLayer();
+      map.add(graphicsLayer);
+
+      var burns = this.burnsService.getBurns();
+
+      burns.forEach(burn => {
+        const point = { //Create a point
+          type: 'point',
+          longitude: burn.longitude,
+          latitude: burn.latitude
+       };
+
+       const popupTemplate = {
+        title: '{Name}',
+        content: '{Status}'
+
+     }
+     let attributes = {
+        Name: burn.burnName,
+        Status: 'Going'
+     }
+  
+       let simpleMarkerSymbol = {
+        type: 'simple-marker',
+        color: [226, 119, 40],  // Orange
+        outline: {
+            color: [255, 255, 255], // White
+            width: 1
+        }
+      };
+
+      if(burn.status === 'SAFE') {
+        simpleMarkerSymbol.color = [0, 153, 51];  // green
+        attributes.Status = 'Safe';
+      } else if(burn.status === 'UNDER CONTROL - 2') {
+        simpleMarkerSymbol.color =  [153, 0, 0];
+        attributes.Status = 'Under Control - 2';
+      }       
+  
+       const pointGraphic = new Graphic({
+        geometry: point,
+        symbol: simpleMarkerSymbol,
+        attributes: attributes,
+        popupTemplate: popupTemplate
+        });
+  
+        graphicsLayer.add(pointGraphic);
+      });      
 
       this.view = new EsriMapView(mapViewProperties);
       await this.view.when();

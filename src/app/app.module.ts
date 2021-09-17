@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { EsriMapComponent } from './esri-map/esri-map.component';
+import { BurnsService } from './services/burns.service';
 
 @NgModule({
   declarations: [
@@ -12,7 +13,7 @@ import { EsriMapComponent } from './esri-map/esri-map.component';
   imports: [
     BrowserModule
   ],
-  providers: [],
+  providers: [BurnsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
